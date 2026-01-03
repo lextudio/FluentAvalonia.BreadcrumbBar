@@ -20,23 +20,18 @@
 
     <StackPanel Margin="16" Spacing="8">
         <faui:InfoBar x:Name="InfoBar" />
-
-        <TextBox Text="{Binding Text.Value}" />
-        <Button Command="{Binding Add}"
-                CommandParameter="{Binding Text.Value}"
-                Content="Add" />
-
-        <CheckBox x:Name="Large" Content="large" />
-        <ComboBox Name="ThemeConboBox" SelectedIndex="0">
-            <ComboBoxItem Content="Light" />
-            <ComboBoxItem Content="Dark" />
-            <ComboBoxItem Content="HighContrast" />
-        </ComboBox>
-
-        <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemsSource="{Binding Items}">
+        <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemsSource="{Binding Breadcrumbs}">
             <ui:BreadcrumbBar.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ItemViewModel">
-                    <ui:BreadcrumbBarItem Content="{Binding Text}" />
+                <DataTemplate x:DataType="viewModels:BreadcrumbItemViewModel">
+                    <ui:BreadcrumbBarItem>
+                        <ui:BreadcrumbBarItem.Content>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
+                                <Button Click="Chevron_Click" Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Text}" VerticalAlignment="Center" />                                    
+                                </Button>
+                            </StackPanel>
+                        </ui:BreadcrumbBarItem.Content>
+                    </ui:BreadcrumbBarItem>
                 </DataTemplate>
             </ui:BreadcrumbBar.ItemTemplate>
         </ui:BreadcrumbBar>
