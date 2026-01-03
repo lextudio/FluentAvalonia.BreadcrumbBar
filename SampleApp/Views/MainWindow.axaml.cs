@@ -12,6 +12,7 @@ using Avalonia.Styling;
 
 using FluentAvalonia.Styling;
 using FluentAvalonia.BreadcrumbBar.UI.Controls;
+using Avalonia.VisualTree;
 using FluentAvalonia.UI.Windowing;
 
 namespace SampleApp.Views;
@@ -36,28 +37,20 @@ public partial class MainWindow : AppWindow
         if (btn.DataContext is not SampleApp.ViewModels.BreadcrumbItemViewModel bvm) return;
 
         var target = bvm.Path;
+        Console.WriteLine($"\n=== CHEVRON CLICK ===");
         Console.WriteLine($"Chevron clicked for path: {target}");
-
-        // Debug: print bounds information for the clicked elements to help diagnose alignment
-        try
+        
+        // Find the parent BreadcrumbBarItem to align with the full item height
+        Control targetControl = btn;
+        var item = btn.FindAncestorOfType<BreadcrumbBarItem>();
+        if (item != null)
         {
-            Console.WriteLine($"BreadcrumbBar.Bounds (local): {BreadcrumbBar.Bounds}");
-            Console.WriteLine($"Button.Bounds (local): {btn.Bounds}");
-            if (btn is Button b2 && b2.Content is TextBlock tb2)
-            {
-                Console.WriteLine($"TextBlock.Bounds (local): {tb2.Bounds}");
-                var tbWindow = tb2.TranslatePoint(new Point(0, 0), this) ?? new Point();
-                Console.WriteLine($"TextBlock top-left (window coords): {tbWindow}");
-                var tbScreen = this.PointToScreen(tbWindow);
-                Console.WriteLine($"TextBlock top-left (screen coords): {tbScreen}");
-            }
-            var barTopLeft = BreadcrumbBar.TranslatePoint(new Point(0,0), this) ?? new Point();
-            var barScreen = this.PointToScreen(barTopLeft);
-            Console.WriteLine($"BreadcrumbBar top-left (window coords): {barTopLeft}, screen coords: {barScreen}");
+            targetControl = item;
+            Console.WriteLine($"Found parent BreadcrumbBarItem. Height: {item.Bounds.Height}");
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"Error while logging bounds: {ex}");
+            Console.WriteLine("Could not find parent BreadcrumbBarItem, falling back to Button");
         }
 
         var children = vm.GetChildren(target).Where(c => !c.Contains('.')).ToArray();
@@ -71,67 +64,84 @@ public partial class MainWindow : AppWindow
             return;
         }
 
-        var popupWindow = new Window
-        {
-            CanResize = false,
-            SystemDecorations = SystemDecorations.None,
-            WindowStartupLocation = WindowStartupLocation.Manual,
-            Width = 240,
-            Height = Math.Min(300, 28 * Math.Max(1, children.Length)),
+        // Create a simple ListBox for the children
+        var items = children.Select(c => System.IO.Path.GetFileName(c)).ToArray();
+        var listBox = new ListBox 
+        { 
+            ItemsSource = items,
+            Background = new SolidColorBrush(Color.FromArgb(255, 240, 240, 240)),
+            MinWidth = 240,
         };
 
-        var items = children.Select(c => System.IO.Path.GetFileName(c)).ToArray();
-        var listBox = new ListBox { ItemsSource = items };
+        // Create a borderless, transparent window for the popup
+        var border = new Border 
+        { 
+            Child = listBox, 
+            Padding = new Thickness(1),
+            Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)),
+            BorderBrush = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(4),
+        };
+        
+        // Add box shadow using the BoxShadows property
+        //var shadow = new BoxShadow { Blur = 8, Spread = 0, OffsetX = 0, OffsetY = 2, Color = Color.FromArgb(128, 0, 0, 0) };
+        //border.BoxShadow = new BoxShadows(shadow);
+        
+        var popupWindow = new Window
+        {
+            Content = border,
+            CanResize = false,
+            ShowInTaskbar = false,
+            SystemDecorations = SystemDecorations.None,
+            Topmost = true,
+            Width = 240,
+            Height = Math.Min(300, 28 * items.Length + 2),
+        };
+
         listBox.SelectionChanged += (_, __) =>
         {
             if (listBox.SelectedIndex >= 0)
             {
                 var selected = children[listBox.SelectedIndex];
-                Console.WriteLine($"Popup item selected, navigating to: {selected}");
+                Console.WriteLine($"Menu item selected, navigating to: {selected}");
                 vm.Navigate.Execute(selected);
-                try { popupWindow.Close(); } catch { }
+                popupWindow?.Close();
             }
         };
 
-        popupWindow.Content = new Border { Child = listBox, Padding = new Thickness(6) };
-
+        // Position the window below the target control (BreadcrumbBarItem or Button)
         try
         {
-            // If the sender is a Button whose Content is a TextBlock, anchor to that TextBlock's left edge
-            if (btn is Button b && b.Content is TextBlock tb)
-            {
-                Console.WriteLine($"Anchoring popup to TextBlock. Text='{tb.Text}', FontSize={tb.FontSize}");
-                // Make ListBox use same font settings so text aligns
-                listBox.FontSize = tb.FontSize;
-                listBox.FontFamily = tb.FontFamily;
+            // 1. Get the bottom-left corner of the target control in its local coordinates
+            var targetBottomLeft = new Point(0, targetControl.Bounds.Height);
 
-                var localTopLeft = new Point(0, 0);
-                var translated = tb.TranslatePoint(localTopLeft, this) ?? localTopLeft;
-                var screen = this.PointToScreen(translated);
-                var popupX = (int)screen.X; // left aligned to text
-                var popupY = (int)(screen.Y + tb.Bounds.Height);
-                popupWindow.Position = new PixelPoint(popupX, popupY);
-                Console.WriteLine($"Opening text-anchored popup at {popupWindow.Position}");
-            }
-            else
+            // 2. Translate that point to the Window's coordinate space
+            var targetBottomLeftInWindow = targetControl.TranslatePoint(targetBottomLeft, this);
+
+            if (targetBottomLeftInWindow.HasValue)
             {
-                // fallback to chevron bounds
-                var localTopLeft = new Point(0, 0);
-                var translated = btn.TranslatePoint(localTopLeft, this) ?? localTopLeft;
-                var screen = this.PointToScreen(translated);
-                var popupX = (int)screen.X; // left aligned
-                var popupY = (int)(screen.Y + btn.Bounds.Height);
-                popupWindow.Position = new PixelPoint(popupX, popupY);
-                Console.WriteLine($"Opening left-aligned popup at {popupWindow.Position} (fallback)");
+                // 3. Convert the Window-relative point to Screen coordinates (PixelPoint)
+                var screenPoint = this.PointToScreen(targetBottomLeftInWindow.Value);
+                
+                // 4. Set the popup position with a small vertical gap (4px) to ensure no overlap
+                popupWindow.Position = new PixelPoint(screenPoint.X, screenPoint.Y + 4);
+
+                Console.WriteLine($"=== ROBUST POSITIONING (Target: {targetControl.GetType().Name}) ===");
+                Console.WriteLine($"Target Height: {targetControl.Bounds.Height}");
+                Console.WriteLine($"Target Bottom-Left (Local): {targetBottomLeft}");
+                Console.WriteLine($"Target Bottom-Left (Window): {targetBottomLeftInWindow.Value}");
+                Console.WriteLine($"Screen Point (PixelPoint): {screenPoint}");
+                Console.WriteLine($"Final Popup Position: {popupWindow.Position}");
+                Console.WriteLine($"==========================");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to anchor popup to chevron: {ex}");
-            var mainScreen = this.PointToScreen(new Point(0, 0));
-            popupWindow.Position = new PixelPoint((int)mainScreen.X + 50, (int)mainScreen.Y + 50);
+            Console.WriteLine($"Error positioning popup: {ex.Message}");
         }
 
+        Console.WriteLine($"Opening popup window with {items.Length} items");
         popupWindow.Show(this);
     }
 
