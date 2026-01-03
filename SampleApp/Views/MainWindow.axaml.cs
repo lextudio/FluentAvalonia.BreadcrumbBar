@@ -14,6 +14,7 @@ using FluentAvalonia.Styling;
 using FluentAvalonia.BreadcrumbBar.UI.Controls;
 using Avalonia.VisualTree;
 using FluentAvalonia.UI.Windowing;
+using Avalonia.Controls.Templates;
 
 namespace SampleApp.Views;
 
@@ -48,10 +49,6 @@ public partial class MainWindow : AppWindow
             targetControl = item;
             Console.WriteLine($"Found parent BreadcrumbBarItem. Height: {item.Bounds.Height}");
         }
-        else
-        {
-            Console.WriteLine("Could not find parent BreadcrumbBarItem, falling back to Button");
-        }
 
         var children = vm.GetChildren(target).Where(c => !c.Contains('.')).ToArray();
         Console.WriteLine($"Children count for '{target}': {children.Length}");
@@ -69,9 +66,28 @@ public partial class MainWindow : AppWindow
         var listBox = new ListBox 
         { 
             ItemsSource = items,
-            Background = new SolidColorBrush(Color.FromArgb(255, 240, 240, 240)),
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(0),
             MinWidth = 240,
         };
+
+        // Style ListBoxItem to match BreadcrumbBarItem text alignment
+        var style = new Style(x => x.OfType<ListBoxItem>());
+        style.Setters.Add(new Setter(ListBoxItem.PaddingProperty, new Thickness(8, 6))); 
+        style.Setters.Add(new Setter(ListBoxItem.MinHeightProperty, 28.0));
+        listBox.Styles.Add(style);
+
+        // Use a DataTemplate to ensure text rendering matches
+        listBox.ItemTemplate = new FuncDataTemplate<string>((data, ns) => 
+        {
+            return new TextBlock 
+            { 
+                Text = data, 
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                Margin = new Thickness(0) 
+            };
+        });
 
         // Create a borderless, transparent window for the popup
         var border = new Border 
@@ -84,10 +100,6 @@ public partial class MainWindow : AppWindow
             CornerRadius = new CornerRadius(4),
         };
         
-        // Add box shadow using the BoxShadows property
-        //var shadow = new BoxShadow { Blur = 8, Spread = 0, OffsetX = 0, OffsetY = 2, Color = Color.FromArgb(128, 0, 0, 0) };
-        //border.BoxShadow = new BoxShadows(shadow);
-        
         var popupWindow = new Window
         {
             Content = border,
@@ -96,7 +108,7 @@ public partial class MainWindow : AppWindow
             SystemDecorations = SystemDecorations.None,
             Topmost = true,
             Width = 240,
-            Height = Math.Min(300, 28 * items.Length + 2),
+            Height = Math.Min(300, 28 * items.Length + 4),
         };
 
         listBox.SelectionChanged += (_, __) =>
@@ -110,7 +122,7 @@ public partial class MainWindow : AppWindow
             }
         };
 
-        // Position the window below the target control (BreadcrumbBarItem or Button)
+        // Position the window below the target control
         try
         {
             // 1. Get the bottom-left corner of the target control in its local coordinates
@@ -124,15 +136,15 @@ public partial class MainWindow : AppWindow
                 // 3. Convert the Window-relative point to Screen coordinates (PixelPoint)
                 var screenPoint = this.PointToScreen(targetBottomLeftInWindow.Value);
                 
-                // 4. Set the popup position with a small vertical gap (4px) to ensure no overlap
-                popupWindow.Position = new PixelPoint(screenPoint.X, screenPoint.Y + 4);
+                // 4. Set the popup position
+                // Shift X by -8 to align the text (since we added 8px padding to ListBoxItem)
+                // Shift Y by 2px for a small gap
+                popupWindow.Position = new PixelPoint(screenPoint.X - 8, screenPoint.Y + 2);
 
-                Console.WriteLine($"=== ROBUST POSITIONING (Target: {targetControl.GetType().Name}) ===");
-                Console.WriteLine($"Target Height: {targetControl.Bounds.Height}");
-                Console.WriteLine($"Target Bottom-Left (Local): {targetBottomLeft}");
-                Console.WriteLine($"Target Bottom-Left (Window): {targetBottomLeftInWindow.Value}");
-                Console.WriteLine($"Screen Point (PixelPoint): {screenPoint}");
-                Console.WriteLine($"Final Popup Position: {popupWindow.Position}");
+                Console.WriteLine($"=== ROBUST POSITIONING ===");
+                Console.WriteLine($"Target: {targetControl.GetType().Name}");
+                Console.WriteLine($"Screen Point: {screenPoint}");
+                Console.WriteLine($"Popup Position: {popupWindow.Position}");
                 Console.WriteLine($"==========================");
             }
         }
