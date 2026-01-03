@@ -13,7 +13,7 @@ using Avalonia.Metadata;
 
 using FluentAvalonia.Core;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 [TemplatePart("PART_ItemsRepeater", typeof(ItemsRepeater))]
 [TemplatePart("PART_Ellipsis", typeof(BreadcrumbBarItem))]

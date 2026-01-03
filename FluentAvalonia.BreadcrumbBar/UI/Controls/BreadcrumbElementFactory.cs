@@ -4,7 +4,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
 using Avalonia.Logging;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 public class BreadcrumbElementFactory : ElementFactory
 {
@@ -21,7 +21,7 @@ public class BreadcrumbElementFactory : ElementFactory
             {
                 _itemTemplateWrapper = new ItemTemplateWrapper(dt);
             }
-            else if (newValue is DataTemplateSelector dts)
+            else if (newValue is FluentAvalonia.UI.Controls.DataTemplateSelector dts)
             {
                 _itemTemplateWrapper = new ItemTemplateWrapper(dts);
             }
@@ -140,11 +140,11 @@ internal class ItemTemplateWrapper : ElementFactory
         AvaloniaProperty.RegisterAttached<ItemTemplateWrapper, Control, IDataTemplate>("OriginTemplate");
 
     private readonly IDataTemplate? _dataTemplate;
-    private readonly DataTemplateSelector? _dataTemplateSelector;
+    private readonly FluentAvalonia.UI.Controls.DataTemplateSelector? _dataTemplateSelector;
 
     public ItemTemplateWrapper(IDataTemplate? dataTemplate) => _dataTemplate = dataTemplate;
 
-    public ItemTemplateWrapper(DataTemplateSelector dts) => _dataTemplateSelector = dts;
+    public ItemTemplateWrapper(FluentAvalonia.UI.Controls.DataTemplateSelector dts) => _dataTemplateSelector = dts;
 
     protected override Control GetElementCore(ElementFactoryGetArgs args)
     {

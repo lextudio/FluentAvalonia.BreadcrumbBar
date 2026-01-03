@@ -10,7 +10,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 
 using FluentAvalonia.Styling;
-using FluentAvalonia.UI.Controls;
+using FluentAvalonia.BreadcrumbBar.UI.Controls;
 using FluentAvalonia.UI.Windowing;
 
 namespace SampleApp.Views;

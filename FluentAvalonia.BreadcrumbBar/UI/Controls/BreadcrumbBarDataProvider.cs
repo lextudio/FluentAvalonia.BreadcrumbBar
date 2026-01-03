@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 //https://github.com/amwx/FluentAvalonia/tree/a95932a84e808e1f3b90e2da8d0757a9abf08011/FluentAvalonia/UI/Controls/NavigationView
 enum BreadcrumbBarSplitVectorID
@@ -360,7 +360,7 @@ internal class BreadcrumbBarDataProvider : SplitDataSourceBase<object, Breadcrum
     public bool IsContainerNavigationViewItem(int index)
     {
         var item = GetAt(index);
-        if (item is NavigationViewItemHeader || item is NavigationViewItemSeparator)
+        if (item is FluentAvalonia.UI.Controls.NavigationViewItemHeader || item is FluentAvalonia.UI.Controls.NavigationViewItemSeparator)
         {
             return false;
         }
@@ -370,7 +370,7 @@ internal class BreadcrumbBarDataProvider : SplitDataSourceBase<object, Breadcrum
     public bool IsContainerNavigationViewHeader(int index)
     {
         var item = GetAt(index);
-        if (item is NavigationViewItemHeader)
+        if (item is FluentAvalonia.UI.Controls.NavigationViewItemHeader)
         {
             return true;
         }

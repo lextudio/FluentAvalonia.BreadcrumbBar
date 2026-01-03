@@ -1,7 +1,7 @@
 ﻿using Avalonia.Collections;
 using System.Diagnostics;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 internal abstract class SplitDataSourceBase<T, TVectorID, AttachedDataType>
 {

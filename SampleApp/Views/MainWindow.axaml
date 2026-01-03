@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:ui="using:FluentAvalonia.BreadcrumbBar.UI.Controls"
+        xmlns:faui="using:FluentAvalonia.UI.Controls"
         xmlns:viewModels="using:SampleApp.ViewModels"
         Title="SampleApp"
         d:DesignHeight="450"
@@ -18,7 +19,7 @@
     </Window.DataTemplates>-->
 
     <StackPanel Margin="16" Spacing="8">
-        <ui:InfoBar x:Name="InfoBar" />
+        <faui:InfoBar x:Name="InfoBar" />
 
         <TextBox Text="{Binding Text.Value}" />
         <Button Command="{Binding Add}"

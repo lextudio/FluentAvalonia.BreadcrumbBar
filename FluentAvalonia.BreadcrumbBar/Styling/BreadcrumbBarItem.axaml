@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="using:FluentAvalonia.UI.Controls">
+                    xmlns:local="using:FluentAvalonia.BreadcrumbBar.UI.Controls">
     <Design.PreviewWith>
 
         <Border Width="500"
@@ -139,27 +139,27 @@
                         </Panel>
                     </Button>
 
-                    <local:FontIcon x:Name="PART_ChevronTextBlock"
-                                    Grid.Column="1"
-                                    Margin="{DynamicResource BreadcrumbBarChevronPadding}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                                    FontSize="{DynamicResource BreadcrumbBarChevronFontSize}"
-                                    Foreground="{DynamicResource BreadcrumbBarNormalForegroundBrush}"
-                                    Glyph="{DynamicResource BreadcrumbBarChevronLeftToRight}" />
+                    <TextBlock x:Name="PART_ChevronTextBlock"
+                               Grid.Column="1"
+                               Margin="{DynamicResource BreadcrumbBarChevronPadding}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                               FontSize="{DynamicResource BreadcrumbBarChevronFontSize}"
+                               Foreground="{DynamicResource BreadcrumbBarNormalForegroundBrush}"
+                               Text="{DynamicResource BreadcrumbBarChevronLeftToRight}" />
                 </Grid>
             </ControlTemplate>
         </Setter>
 
         <Style Selector="^[FlowDirection=RightToLeft]">
-            <Style Selector="^ /template/ local|FontIcon#PART_ChevronTextBlock">
-                <Setter Property="Glyph" Value="{DynamicResource BreadcrumbBarChevronRightToLeft}" />
+            <Style Selector="^ /template/ TextBlock#PART_ChevronTextBlock">
+                <Setter Property="Text" Value="{DynamicResource BreadcrumbBarChevronRightToLeft}" />
             </Style>
         </Style>
 
         <Style Selector="^:last">
-            <Style Selector="^ /template/ local|FontIcon#PART_ChevronTextBlock">
+            <Style Selector="^ /template/ TextBlock#PART_ChevronTextBlock">
                 <Setter Property="IsVisible" Value="False" />
             </Style>
         </Style>
@@ -178,7 +178,7 @@
             <Style Selector="^ /template/ Grid#PART_LayoutRoot">
                 <Setter Property="Margin" Value="5,3" />
             </Style>
-            <Style Selector="^ /template/ local|FontIcon#PART_ChevronTextBlock">
+            <Style Selector="^ /template/ TextBlock#PART_ChevronTextBlock">
                 <Setter Property="IsVisible" Value="False" />
             </Style>
             <Style Selector="^ /template/ Button#PART_ItemButton">

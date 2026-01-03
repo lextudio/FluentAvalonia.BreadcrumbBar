@@ -4,13 +4,13 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 [TemplatePart("PART_LayoutRoot", typeof(Grid))]
 [TemplatePart("PART_ItemButton", typeof(Button))]
 [TemplatePart("PART_ContentPresenter", typeof(ContentPresenter))]
 [TemplatePart("PART_EllipsisTextBlock", typeof(TextBlock))]
-[TemplatePart("PART_ChevronTextBlock", typeof(FontIcon))]
+[TemplatePart("PART_ChevronTextBlock", typeof(TextBlock))]
 [PseudoClasses(":last", ":ellipsis", ":ellipsis-dropdown")]
 public class BreadcrumbBarItem : ContentControl
 {

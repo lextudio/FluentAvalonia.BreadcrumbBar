@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentAvalonia.UI.Controls;
+namespace FluentAvalonia.BreadcrumbBar.UI.Controls;
 
 public class BreadcrumbBarItemClickedEventArgs : EventArgs
 {
